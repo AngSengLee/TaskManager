@@ -1,5 +1,8 @@
 package com.example.a16004798.taskmanager;
 
+import android.app.Activity;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -11,8 +14,11 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 
 public class MainActivity extends AppCompatActivity {
+
+    int reqCode = 12345;
 
     ListView lv;
     DBHelper db;
@@ -25,6 +31,20 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.SECOND, 5); //amount 5 means, 5 seconds later, it pop up
+
+        //Create a new PendingIntent and add it to the AlarmManager
+        Intent intent = new Intent(MainActivity.this, BroadcastReceiverNotification.class);
+
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(MainActivity.this, reqCode, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+
+        AlarmManager am = (AlarmManager)getSystemService(Activity.ALARM_SERVICE);
+
+        //Set the alarm
+        am.set(AlarmManager.RTC_WAKEUP, cal.getTimeInMillis(), pendingIntent);
+
 
         db = new DBHelper(this);
         db.getWritableDatabase();
